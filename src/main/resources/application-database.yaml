@@ -1,0 +1,32 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: jdbc:mysql://localhost:3306/msa?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root1234!!
+
+
+# h2 database settings
+#spring:
+#  h2:
+#    console:
+#      enabled: true
+#      settings:
+#        web-allow-others: true # 유레카를 통해 들어 가니까 허용
+#  datasource:
+#    #    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:testdb
+##    username: me
+##    password:
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+#    show-sql: true
+#    generate-ddl: true
