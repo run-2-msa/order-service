@@ -3,6 +3,7 @@ package com.example.orderservice.controller;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.messagequeue.KafkaProducer;
+import com.example.orderservice.messagequeue.OrderProducer;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.vo.OrderRequest;
 import com.example.orderservice.vo.OrderResponse;
@@ -15,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,6 +30,7 @@ public class OrderController {
     private final Environment env;
     private final OrderService orderService;
     private final KafkaProducer kafkaProducer;
+    private final OrderProducer orderProducer;
 
     @GetMapping("/health-check")
     public String status(){
@@ -41,12 +46,23 @@ public class OrderController {
 
         var orderDto = mapper.map(orderRequest, OrderDto.class);
         orderDto.setUserId(userId);
+
+        /*
         var newOrderDto = orderService.createOrder(orderDto);
-
         var response =  mapper.map(newOrderDto, OrderResponse.class);
+        */
 
+        /* kafka */
+        orderDto.setOrderId(UUID.randomUUID().toString());
+        orderDto.setTotalPrice(new BigDecimal(orderDto.getQty()).multiply(orderDto.getUnitPrice()));
+        // orderDto.setCreatedAt(LocalDateTime.now()); CURRENT_TIMESTAMP
+
+        orderProducer.send("orders", orderDto);
         /* send this order to kafka */
-        kafkaProducer.send("example-catalog-topic", newOrderDto);
+        kafkaProducer.send("example-catalog-topic", orderDto);
+
+
+        var response =  mapper.map(orderDto, OrderResponse.class);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
