@@ -6,7 +6,7 @@ spring:
     name: order-service
 
   profiles:
-    include: eureka, database, message, zipkin
+    include: eureka, database, message, zipkin, actuator
 
 #logging:
 #  level:

@@ -1,0 +1,8 @@
+# actuator
+# management 작성 안해도 바로 /actuator로 사용가능 ex) /actuator/health
+# 기본적 으로 self, health, health-check만 가져옴
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, httpexchanges, info, metrics, prometheus
