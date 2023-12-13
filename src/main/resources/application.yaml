@@ -1,7 +1,13 @@
-spring:
-  profiles:
-    include: secret, database, message
+server:
+  port: 0
 
-logging:
-  level:
-    com.example.orderservice: DEBUG
+spring:
+  application:
+    name: order-service
+
+  profiles:
+    include: eureka, database, message, zipkin
+
+#logging:
+#  level:
+#    com.example.orderservice: DEBUG

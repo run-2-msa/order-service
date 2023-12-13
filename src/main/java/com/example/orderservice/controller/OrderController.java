@@ -9,6 +9,7 @@ import com.example.orderservice.vo.OrderRequest;
 import com.example.orderservice.vo.OrderResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.core.env.Environment;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -41,36 +43,36 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@PathVariable String userId,
                                                      @RequestBody @Valid OrderRequest orderRequest){
 
+        log.info("Before call createOrder order data");
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         var orderDto = mapper.map(orderRequest, OrderDto.class);
         orderDto.setUserId(userId);
 
-        /*
         var newOrderDto = orderService.createOrder(orderDto);
         var response =  mapper.map(newOrderDto, OrderResponse.class);
-        */
-
-        /* kafka */
+/*
+        // kafka /
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(new BigDecimal(orderDto.getQty()).multiply(orderDto.getUnitPrice()));
         // orderDto.setCreatedAt(LocalDateTime.now()); CURRENT_TIMESTAMP
 
         orderProducer.send("orders", orderDto);
-        /* send this order to kafka */
+        // send this order to kafka
         kafkaProducer.send("example-catalog-topic", orderDto);
 
 
         var response =  mapper.map(orderDto, OrderResponse.class);
-
+*/
+        log.info("After call createOrder order data");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
     @GetMapping("/users/{userId}") // 음..
     public ResponseEntity<List<OrderResponse>> getOrderList(@PathVariable String userId){
-
+        log.info("Before call getOrder order data");
         List<OrderEntity> orderList = orderService.getAllOrdersByUserId(userId);
 
         var response = orderList.stream().map(it->{
@@ -83,13 +85,18 @@ public class OrderController {
                     .createdAt(it.getCreatedAt())
                     .build();
         }).collect(Collectors.toList());
-
+       /* try{
+            Thread.sleep(1000);
+            throw new RuntimeException("장애 발생!!");
+        } catch (InterruptedException e) {
+            log.warn(e.getMessage());
+        }*/
+        log.info("After call getOrder order data");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderId){
-
         OrderDto orderDto = orderService.getOrderByOrderId(orderId);
 
         var response =  OrderResponse.builder()
@@ -100,7 +107,6 @@ public class OrderController {
                 .totalPrice(orderDto.getTotalPrice())
                 .createdAt(orderDto.getCreatedAt())
                 .build();
-
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
