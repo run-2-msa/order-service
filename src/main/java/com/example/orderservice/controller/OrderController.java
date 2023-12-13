@@ -47,22 +47,21 @@ public class OrderController {
         var orderDto = mapper.map(orderRequest, OrderDto.class);
         orderDto.setUserId(userId);
 
-        /*
+        // 기존
         var newOrderDto = orderService.createOrder(orderDto);
         var response =  mapper.map(newOrderDto, OrderResponse.class);
-        */
 
-        /* kafka */
+        /* *//* kafka *//*
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(new BigDecimal(orderDto.getQty()).multiply(orderDto.getUnitPrice()));
         // orderDto.setCreatedAt(LocalDateTime.now()); CURRENT_TIMESTAMP
 
         orderProducer.send("orders", orderDto);
-        /* send this order to kafka */
+        *//* send this order to kafka *//*
         kafkaProducer.send("example-catalog-topic", orderDto);
 
 
-        var response =  mapper.map(orderDto, OrderResponse.class);
+        var response =  mapper.map(orderDto, OrderResponse.class);*/
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
