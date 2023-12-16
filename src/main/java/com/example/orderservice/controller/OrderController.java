@@ -50,21 +50,19 @@ public class OrderController {
         var orderDto = mapper.map(orderRequest, OrderDto.class);
         orderDto.setUserId(userId);
 
-        var newOrderDto = orderService.createOrder(orderDto);
-        var response =  mapper.map(newOrderDto, OrderResponse.class);
-/*
+        /*var newOrderDto = orderService.createOrder(orderDto);
+        var response =  mapper.map(newOrderDto, OrderResponse.class);*/
+
         // kafka /
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(new BigDecimal(orderDto.getQty()).multiply(orderDto.getUnitPrice()));
         // orderDto.setCreatedAt(LocalDateTime.now()); CURRENT_TIMESTAMP
 
-        orderProducer.send("orders", orderDto);
+        //orderProducer.send("orders", orderDto); // sink db
         // send this order to kafka
-        kafkaProducer.send("example-catalog-topic", orderDto);
-
-
+        kafkaProducer.send("example-catalog-topic", orderDto); // producer
         var response =  mapper.map(orderDto, OrderResponse.class);
-*/
+
         log.info("After call createOrder order data");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
